@@ -50,4 +50,10 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  # start service on boot since ansible enable=yes doesn't work properly on cent os 6.5
+  # at leat with httpd
+  # https://github.com/ansible/ansible/issues/7715
+  # https://github.com/ansible/ansible/issues/7757
+  config.vm.provision :shell, :path => "start.sh", run: "always"
+
 end

@@ -37,10 +37,11 @@
     notify:
       - restart apache
 
-  - name: Apache | Run
+  - name: Apache | Start + Run on boot
     service: >
       name=httpd
       state=started
+      enabled=yes
 
 ############################
 # PHP
@@ -99,10 +100,11 @@
     notify:
       - restart mysql
 
-  - name: MySQL | Run
+  - name: MySQL | Start + Run on boot
     service: >
       name=mysqld
-      state=started
+      state=started      
+      enabled=yes
 
   - name: MySQL | Root password (root)
     mysql_user: >
@@ -188,7 +190,7 @@
 ############################
 # MACHINE
 #
-  - name: Machine | Disable firewall (fixme)
+  - name: Machine | Disable firewall (!!!)
     action: service name=iptables state=stopped enabled=false
 
 ############################
