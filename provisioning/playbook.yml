@@ -1,5 +1,5 @@
 ---
-- hosts: ssvagrant
+- hosts: ss.local.dev
   gather_facts: yes
 
   tasks:
@@ -104,9 +104,6 @@
       name=mysqld
       state=started
 
-  - name: MySQL | root Remote connection
-    shell: mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
-
   - name: MySQL | Root password (root)
     mysql_user: >
       name=root
@@ -117,6 +114,9 @@
       - 127.0.0.1
       - ::1
       - localhost
+
+#  - name: MySQL | root Remote connection
+#    shell: mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 
   - name: MySQL | Python Config
     template: >

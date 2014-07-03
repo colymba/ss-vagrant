@@ -20,8 +20,8 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 3306, host: 3306, auto_correct: true
 
   #Choose between private or public if you want bridged network functionality
-  #config.vm.network "public_network", ip: "10.11.12.13"
-  config.vm.network "private_network", ip: "10.11.12.13"
+  #config.vm.network "public_network", ip: "192.168.33.33"
+  config.vm.network "private_network", ip: "192.168.33.33"
 
   config.vm.provider :virtualbox do |v|
     #v.customize ["modifyvm", :id, "--name", "ssvagrant"]

@@ -1,1 +1,1 @@
-ssvagrant ansible_ssh_host=10.11.12.13 ansible_ssh_port=22
+ss.local.dev ansible_ssh_host=192.168.33.33 ansible_ssh_port=22
