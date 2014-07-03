@@ -1,0 +1,16 @@
+{
+  "name": "colymba/ss-vagrant",
+  "type": "silverstripe-module",
+  "description": "Vagrant base VM for Silverstripe/LAMP development.",
+  "homepage": "https://github.com/colymba/ss-vagrant",
+  "keywords": ["vagrant","VirtualBox","cent os","Ansible","lamp","silverstripe"],
+  "license": "BSD Simplified",
+  "authors": [{
+    "name": "Thierry Francois",
+    "homepage": "http://colymba.com"
+  }],
+  "repositories": [{
+    "type": "vcs",
+    "url": "git@github.com:colymba/ss-vagrant.git"
+  }]
+}
