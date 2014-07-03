@@ -13,9 +13,9 @@
       state=directory
       mode=750
 
-  - name: SilverStripe | Environment
-    shell: cp -f /vagrant/config/_ss_environment.php /vagrant/www/_ss_environment.php
-    # using shell since ansible copy will fail due to sync_folder rights (at least in windows)
+#   - name: SilverStripe | Environment
+#     shell: cp -f /vagrant/config/_ss_environment.php /vagrant/www/_ss_environment.php
+#     # using shell since ansible copy will fail due to sync_folder rights (at least in windows)
 
 ############################
 # APACHE
