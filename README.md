@@ -18,7 +18,8 @@ Vagrant base VM for SilverStripe development or anything else LAMP.
 - [Ansible](//www.ansible.com) (Unix system)
 
 ## Usage
-- git submodule (JJG-Ansible-Windows)
+- git submodule init
+- git submodule update
 - vagrant up
 - www folder ready
 - use localhost:8080 or 10.11.12.13 or map ss.local.dev to the IP
