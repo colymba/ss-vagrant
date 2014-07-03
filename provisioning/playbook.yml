@@ -1,0 +1,198 @@
+---
+- hosts: ssvagrant
+  gather_facts: yes
+
+  tasks:
+
+############################
+# TREE
+#
+  - name: TREE | Make directories 
+    file: >
+      path=/vagrant/www 
+      state=directory
+      mode=750
+
+  - name: SilverStripe | Environment
+    shell: cp -f /vagrant/config/_ss_environment.php /vagrant/www/_ss_environment.php
+    # using shell since ansible copy will fail due to sync_folder rights (at least in windows)
+
+############################
+# APACHE
+#
+  - name: Apache | Install 
+    yum: >
+      pkg={{item}}
+      state=latest
+    with_items:
+      - httpd
+      - httpd-devel
+      - mod_ssl
+      - openssh
+
+  - name: Apache | Config
+    template: >
+      src=/vagrant/config/httpd.conf
+      dest=/etc/httpd/conf/httpd.conf
+    notify:
+      - restart apache
+
+  - name: Apache | Run
+    service: >
+      name=httpd
+      state=started
+
+############################
+# PHP
+#
+  - name: PHP 5.5 | Add package
+    command: rpm -Uvh --replacepkgs http://mirror.webtatic.com/yum/el6/latest.rpm
+
+  - name: PHP 5.5 | Install 
+    yum: >
+      pkg={{item}}
+      state=latest
+    with_items:
+      - php55w
+      - php55w-common
+      - php55w-pdo
+      - php55w-mysqlnd
+      - php55w-session
+      - php55w-dom
+      - php55w-gd
+      - php55w-fileinfo
+      - php55w-hash
+      - php55w-iconv
+      - php55w-mbstring
+      - php55w-simplexml
+      - php55w-tokenizer
+      - php55w-xml
+      - php55w-tidy
+
+  - name: PHP | Config
+    template: >
+      src=/vagrant/config/php.ini
+      dest=/etc/php.ini
+    notify:
+      - restart apache
+
+  - name: PHP | Session files right
+    shell: 'chown -R vagrant: /var/lib/php/session'
+
+############################
+# MySQL
+#
+  - name: MySQL | Install 
+    yum: >
+      pkg={{item}}
+      state=latest
+    with_items:
+      - MySQL-python
+      - mysql
+      - mysql-server
+
+  - name: MySQL | Global Config
+    template: >
+      src=/vagrant/config/my.cnf
+      dest=/etc/my.cnf
+      owner=root group=root mode=644
+    notify:
+      - restart mysql
+
+  - name: MySQL | Run
+    service: >
+      name=mysqld
+      state=started
+
+  - name: MySQL | Root password (root)
+    mysql_user: >
+      name=root
+      host={{item}}
+      password=root
+      priv=*.*:ALL,GRANT
+    with_items:
+      - 127.0.0.1
+      - ::1
+      - localhost
+
+  - name: MySQL | Python Config
+    template: >
+      src=/vagrant/config/python.my.cnf
+      dest=/root/.my.cnf
+      owner=root group=root mode=600
+
+  - name: MySQL | Delete anonymous
+    mysql_user: >
+      name=""
+      state=absent
+
+  - name: MySQL | Delete test DB
+    mysql_db: >
+      name="test"
+      state=absent
+
+  - name: MySQL | Default DB (vagrant)
+    mysql_db: >
+      name=vagrant
+      state=present
+
+############################
+# COMPOSER
+#
+  - name: Composer | Install
+    shell: curl -sS https://getcomposer.org/installer | php
+  - name: Composer | Make Global
+    shell: mv composer.phar /usr/bin/composer
+  - name: Composer | Git dependency 
+    yum: >
+      name=git
+      state=latest
+
+############################
+# EXTRAS
+#
+  - name: XTRA | Pear+Devel+OPCache 
+    yum: >
+      pkg={{item}}
+      state=latest
+    with_items:
+      - php-pear
+      - php55w-devel
+      - php55w-opcache
+      - pcre-devel
+      - gcc
+      - make
+    notify:
+      - restart apache
+  - name: XTRA | Pear channels update 
+    command: pear channel-update {{item}}
+    register: channel_update
+    failed_when: "channel_update.stderr"
+    with_items:
+      - pear.php.net
+  - name: XTRA | Pear channels discover 
+    command: pear channel-discover {{item}}
+    register: channel_discover
+    failed_when: "channel_discover.stderr"
+    with_items:
+      - pear.symfony.com
+  - name: XTRA | Pear packages 
+    command: pear install {{item}}
+    register: channel_package
+    failed_when: "channel_package.stderr"
+    with_items: []
+
+############################
+# MACHINE
+#
+  - name: Machine | Disable firewall (fixme)
+    action: service name=iptables state=stopped enabled=false
+
+############################
+# HANDLERS
+#
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted
+    - name: restart mysql
+      service: name=mysqld state=restarted
